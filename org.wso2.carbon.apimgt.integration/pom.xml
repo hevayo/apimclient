@@ -23,6 +23,7 @@
         <module>org.wso2.carbon.apimgt.publisher.client</module>
         <module>org.wso2.carbon.apimgt.store.client</module>
         <module>org.wso2.carbon.apimgt.client</module>
+        <module>org.wso2.carbon.apimgt.client.feature</module>
     </modules>
 
     <repositories>
