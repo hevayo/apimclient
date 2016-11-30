@@ -18,12 +18,11 @@
 
 package org.wso2.carbon.apimgt.client.tests;
 
-import org.wso2.carbon.apimgt.api.APIManagementException;
 import org.wso2.carbon.apimgt.client.PublisherClient;
 import org.wso2.carbon.apimgt.client.StoreClient;
-import org.wso2.carbon.apimgt.client.common.APIMClientException;
-import org.wso2.carbon.apimgt.client.common.APIMConfigReader;
-import org.wso2.carbon.apimgt.client.common.configs.APIMConfig;
+import org.wso2.carbon.apimgt.client.APIMClientException;
+import org.wso2.carbon.apimgt.client.APIMConfigReader;
+import org.wso2.carbon.apimgt.client.configs.APIMConfig;
 import org.wso2.carbon.apimgt.publisher.client.model.API;
 import org.wso2.carbon.apimgt.publisher.client.model.APIInfo;
 import org.wso2.carbon.apimgt.publisher.client.model.APIList;
@@ -55,7 +54,7 @@ public class TestClass3 {
             //createNewTestApi(fileString, apimConfig);
             searchStoreAPIsAndApps(apimConfig);
 
-        } catch (APIManagementException e) {
+        } catch (APIMClientException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();

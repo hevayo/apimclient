@@ -4,12 +4,9 @@ import feign.Feign;
 import feign.gson.GsonDecoder;
 import feign.gson.GsonEncoder;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.client.common.APIMClientException;
-import org.wso2.carbon.apimgt.client.common.APIMErrorDecoder;
-import org.wso2.carbon.apimgt.client.common.IntegratedAuthBearerRequestInterceptor;
-import org.wso2.carbon.apimgt.client.common.TrustedFeignClient;
-import org.wso2.carbon.apimgt.client.common.configs.APIMConfig;
+import org.wso2.carbon.apimgt.client.internal.IntegratedAuthBearerRequestInterceptor;
+import org.wso2.carbon.apimgt.client.internal.TrustedFeignClient;
+import org.wso2.carbon.apimgt.client.configs.APIMConfig;
 import org.wso2.carbon.apimgt.publisher.client.api.*;
 import org.wso2.carbon.apimgt.publisher.client.invoker.ApiClient;
 import org.wso2.carbon.apimgt.publisher.client.model.*;
@@ -51,7 +48,7 @@ public class PublisherClient {
         this.config = config;
         try {
             dcr = new DcrClient(config);
-        } catch (APIManagementException e) {
+        } catch (APIMClientException e) {
             log.error("Error initializing DCR client");
         }
 

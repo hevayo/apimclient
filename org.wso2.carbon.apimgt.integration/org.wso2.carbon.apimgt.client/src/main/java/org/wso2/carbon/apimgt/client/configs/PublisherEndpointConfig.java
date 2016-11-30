@@ -16,16 +16,13 @@
  * under the License.
  */
 
-package org.wso2.carbon.apimgt.client.common.configs;
+package org.wso2.carbon.apimgt.client.configs;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public class DCREndpointConfig {
+public class PublisherEndpointConfig {
 
     private String url;
-    private String userName;
-    private String password;
-    private ClientProfileConfig clientProfile;
 
     @XmlElement(name = "URL", required = true)
     public String getUrl() {
@@ -34,33 +31,6 @@ public class DCREndpointConfig {
 
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    @XmlElement(name = "UserName", required = true)
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    @XmlElement(name = "Password", required = true)
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    @XmlElement(name = "ClientProfile", required = true)
-    public ClientProfileConfig getClientProfile() {
-        return clientProfile;
-    }
-
-    public void setClientProfile(ClientProfileConfig clientProfile) {
-        this.clientProfile = clientProfile;
     }
 
 }

@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.apimgt.client.common.configs;
+package org.wso2.carbon.apimgt.client.configs;
 
 import javax.xml.bind.annotation.XmlElement;
 

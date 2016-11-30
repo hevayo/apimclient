@@ -16,13 +16,14 @@
  * under the License.
  */
 
-package org.wso2.carbon.apimgt.client.common;
+package org.wso2.carbon.apimgt.client.internal;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.apimgt.client.DcrClient;
+import org.wso2.carbon.apimgt.client.APIMClientException;
 
 
 public class IntegratedAuthBearerRequestInterceptor implements RequestInterceptor {

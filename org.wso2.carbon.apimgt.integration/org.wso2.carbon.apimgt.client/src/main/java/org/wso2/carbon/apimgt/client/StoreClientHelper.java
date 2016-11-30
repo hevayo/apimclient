@@ -16,15 +16,11 @@
  * under the License.
  */
 
-package org.wso2.carbon.apimgt.client.helpers;
+package org.wso2.carbon.apimgt.client;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.client.DcrClient;
-import org.wso2.carbon.apimgt.client.StoreClient;
-import org.wso2.carbon.apimgt.client.common.APIMClientException;
-import org.wso2.carbon.apimgt.client.common.configs.APIMConfig;
+import org.wso2.carbon.apimgt.client.configs.APIMConfig;
 import org.wso2.carbon.apimgt.store.client.model.*;
 
 import java.util.List;
@@ -32,61 +28,23 @@ import java.util.List;
 
 public class StoreClientHelper {
     private static final Log log = LogFactory.getLog(StoreClientHelper.class);
-    private StoreClient internalStoreClient;
-    private APIMConfig config;
+    private StoreClient storeClient;
     private DcrClient dcrClient;
 
     /**
      * Initialize APIMIntegration client with a APIMConfig provided as the config
      *
      * @param config - An instance of APIMConfig, see apim-integration.xml
-     * @throws APIManagementException
+     * @throws APIMClientException
      */
-    public StoreClientHelper(APIMConfig config) throws APIManagementException {
+    public StoreClientHelper(APIMConfig config) throws APIMClientException {
         if (config == null) {
-            throw new APIManagementException("APIM config should not be null, see apim-ntegration.xml");
+            throw new APIMClientException("APIM config should not be null, see apim-ntegration.xml");
         }
-        this.config = config;
-        this.internalStoreClient = new StoreClient(config);
+        this.storeClient = new StoreClient(config);
         this.dcrClient = new DcrClient(config);
     }
 
-    private static ApplicationInfo getExistingApp(Application application, List<ApplicationInfo> appList) {
-        for (ApplicationInfo app : appList) {
-            if (application.getName().equals(app.getName())) {
-                return app;
-            }
-        }
-        return null;
-    }
-
-    private static ApplicationKey getProductionKeyIfExists(Application apimApp) {
-        if (apimApp.getKeys().isEmpty()) {
-            return null;
-        } else {
-            List<ApplicationKey> appKeys = apimApp.getKeys();
-            for (ApplicationKey key : appKeys) {
-                if (key.getKeyType().equals(ApplicationKey.KeyTypeEnum.PRODUCTION)) {
-                    return key;
-                }
-            }
-            return null;
-        }
-    }
-
-    private static Subscription getExistingSubscription(SubscriptionList existingSubscriptions, Subscription subscription) {
-        for (Subscription apiSubscription : existingSubscriptions.getList()) {
-            if (apiSubscription.getApplicationId().equals(subscription.getApplicationId())) {
-                return apiSubscription;
-            }
-        }
-        return null;
-    }
-
-    //TODO to be removed once apim fix is avaialable
-    public void setDcrClient(DcrClient dcrClient) {
-        this.dcrClient = dcrClient;
-    }
 
     /**
      * Get a list of of available APIs (from WSO2-APIM) qualifying under a given search query.
@@ -98,11 +56,11 @@ public class StoreClientHelper {
     public APIList searchStoreAPIs(String tenant, String searchQuery) throws APIMClientException {
         APIList result = null;
         try {
-            result = internalStoreClient.getAvailableStoreApis(100, 0, tenant, searchQuery);
+            result = storeClient.getAvailableStoreApis(100, 0, tenant, searchQuery);
         } catch (APIMClientException e) {
             if (e.getResponseStatus() == 401) {
                 dcrClient.getRenewedToken();
-                result = internalStoreClient.getAvailableStoreApis(100, 0, tenant, searchQuery);
+                result = storeClient.getAvailableStoreApis(100, 0, tenant, searchQuery);
             } else {
                 throw e;
             }
@@ -150,7 +108,7 @@ public class StoreClientHelper {
             log.info("API subscription already exists availableSubscription.getSubscriptionId() = " + availableSubscription.getSubscriptionId());
         } else {
             result = subscribeAPItoApp(subs);
-            System.out.println("API getSubscriptionId successfull subscriptionResult.getSubscriptionId() = " + result.getSubscriptionId());
+            log.info("API getSubscriptionId successfull subscriptionResult.getSubscriptionId() = " + result.getSubscriptionId());
         }
         return result;
     }
@@ -162,14 +120,13 @@ public class StoreClientHelper {
      * @return - An instance of ApplicationKeyDTO, which contains the information of keys(consumerKey, consumerSecret, accessToken).
      * @throws APIMClientException - If fails to invoke the operation due to wrong credentials or any other issue
      */
-    public ApplicationKey generateKeysforAppIfNotExists(ApplicationKeyGenerateRequest keygenRequest, Application apimApp) throws APIMClientException {
+    public ApplicationKey generateKeysForAppIfNotExists(ApplicationKeyGenerateRequest keygenRequest, Application apimApp) throws APIMClientException {
         ApplicationKey applicationKey = getProductionKeyIfExists(apimApp);
         if (applicationKey != null) {
-            System.out.println("A PRODCUTION applicationKey is already exists therefore not cretating keys, applicationKey.getConsumerKey and secret " + applicationKey.getConsumerKey() + "  " + applicationKey.getConsumerSecret());
+            log.info("A PRODCUTION applicationKey is already exists therefore not creating keys, applicationKey.getConsumerKey " + applicationKey.getConsumerKey());
         } else {
-            applicationKey = generateKeysforApp(keygenRequest, apimApp.getApplicationId());
-            System.out.println("API applicationKey gen OK, applicationKey.getConsumerKey and secret " + applicationKey.getConsumerKey() + "  " + applicationKey.getConsumerSecret());
-            System.out.println("API applicationKey generation successfull applicationKey.getToken().toString() = " + applicationKey.getToken().toString());
+            applicationKey = generateKeysForApp(keygenRequest, apimApp.getApplicationId());
+            log.info("API applicationKey gen OK, applicationKey.getConsumerKey  " + applicationKey.getConsumerKey());
         }
         return applicationKey;
     }
@@ -184,11 +141,11 @@ public class StoreClientHelper {
 
         ApplicationList result = null;
         try {
-            result = internalStoreClient.getAvailableApplications("", "", 100, 0);
+            result = storeClient.getAvailableApplications("", "", 100, 0);
         } catch (APIMClientException e) {
             if (e.getResponseStatus() == 401) {
                 dcrClient.getRenewedToken();
-                result = internalStoreClient.getAvailableApplications("", "", 100, 0);
+                result = storeClient.getAvailableApplications("", "", 100, 0);
             } else {
                 throw e;
             }
@@ -203,15 +160,15 @@ public class StoreClientHelper {
      * @return - An instance of APIMApplicationDTO, which contains the details of application corresponds to appId.
      * @throws APIMClientException - If fails to invoke the operation due to wrong credentials or any other issue
      */
-    private Application getAPIMApplicationDetails(String appId) throws APIMClientException {
+    public Application getAPIMApplicationDetails(String appId) throws APIMClientException {
 
         Application resultApp = null;
         try {
-            resultApp = internalStoreClient.getApplicationDetails(appId);
+            resultApp = storeClient.getApplicationDetails(appId);
         } catch (APIMClientException e) {
             if (e.getResponseStatus() == 401) {
                 dcrClient.getRenewedToken();
-                resultApp = internalStoreClient.getApplicationDetails(appId);
+                resultApp = storeClient.getApplicationDetails(appId);
             } else {
                 throw e;
             }
@@ -226,15 +183,15 @@ public class StoreClientHelper {
      * @return - An instance of APIMApplicationDTO, which contains the information of the application created.
      * @throws APIMClientException - If fails to invoke the operation due to wrong credentials or any other issue
      */
-    private Application createAPIMApplication(Application requestApp) throws APIMClientException {
+    public Application createAPIMApplication(Application requestApp) throws APIMClientException {
 
         Application result = null;
         try {
-            result = internalStoreClient.createApplication(requestApp);
+            result = storeClient.createApplication(requestApp);
         } catch (APIMClientException e) {
             if (e.getResponseStatus() == 401) {
                 dcrClient.getRenewedToken();
-                result = internalStoreClient.createApplication(requestApp);
+                result = storeClient.createApplication(requestApp);
             } else {
                 throw e;
             }
@@ -248,14 +205,14 @@ public class StoreClientHelper {
      * @return - An instance of SubscriptionListDTO, which contains the list of subscriptions of the requested api.
      * @throws APIMClientException - If fails to invoke the operation due to wrong credentials or any other issue
      */
-    private SubscriptionList getExistingSubscriptions(String apiId, String applicationId) throws APIMClientException {
+    public SubscriptionList getExistingSubscriptions(String apiId, String applicationId) throws APIMClientException {
         SubscriptionList result = null;
         try {
-            result = internalStoreClient.getSusbscriptions(apiId, applicationId, "", 0, 100);
+            result = storeClient.getSusbscriptions(apiId, applicationId, "", 0, 100);
         } catch (APIMClientException e) {
             if (e.getResponseStatus() == 401) {
                 dcrClient.getRenewedToken();
-                result = internalStoreClient.getSusbscriptions(apiId, applicationId, "", 0, 100);
+                result = storeClient.getSusbscriptions(apiId, applicationId, "", 0, 100);
             } else {
                 throw e;
             }
@@ -270,14 +227,14 @@ public class StoreClientHelper {
      * @return - An instance of SubscriptionDTO, which contains the information of the subscription details.
      * @throws APIMClientException - If fails to invoke the operation due to wrong credentials or any other issue
      */
-    private Subscription subscribeAPItoApp(Subscription subscriptionRequest) throws APIMClientException {
+    public Subscription subscribeAPItoApp(Subscription subscriptionRequest) throws APIMClientException {
         Subscription result = null;
         try {
-            result = internalStoreClient.addNewSubscription(subscriptionRequest);
+            result = storeClient.addNewSubscription(subscriptionRequest);
         } catch (APIMClientException e) {
             if (e.getResponseStatus() == 401) {
                 dcrClient.getRenewedToken();
-                result = internalStoreClient.addNewSubscription(subscriptionRequest);
+                result = storeClient.addNewSubscription(subscriptionRequest);
             } else {
                 throw e;
             }
@@ -293,19 +250,52 @@ public class StoreClientHelper {
      * @return - An instance of ApplicationKeyDTO, which contains the information of keys(consumerKey, consumerSecret, accessToken).
      * @throws APIMClientException - If fails to invoke the operation due to wrong credentials or any other issue
      */
-    private ApplicationKey generateKeysforApp(ApplicationKeyGenerateRequest keygenRequest, String applicationId) throws APIMClientException {
+    public ApplicationKey generateKeysForApp(ApplicationKeyGenerateRequest keygenRequest, String applicationId) throws APIMClientException {
         ApplicationKey result = null;
         try {
-            result = internalStoreClient.generateKeysForApplication(applicationId, keygenRequest);
+            result = storeClient.generateKeysForApplication(applicationId, keygenRequest);
         } catch (APIMClientException e) {
             if (e.getResponseStatus() == 401) {
                 dcrClient.getRenewedToken();
-                result = internalStoreClient.generateKeysForApplication(applicationId, keygenRequest);
+                result = storeClient.generateKeysForApplication(applicationId, keygenRequest);
             } else {
                 throw e;
             }
         }
         return result;
+    }
+
+
+    private static ApplicationInfo getExistingApp(Application application, List<ApplicationInfo> appList) {
+        for (ApplicationInfo app : appList) {
+            if (application.getName().equals(app.getName())) {
+                return app;
+            }
+        }
+        return null;
+    }
+
+    private static ApplicationKey getProductionKeyIfExists(Application apimApp) {
+        if (apimApp.getKeys().isEmpty()) {
+            return null;
+        } else {
+            List<ApplicationKey> appKeys = apimApp.getKeys();
+            for (ApplicationKey key : appKeys) {
+                if (key.getKeyType().equals(ApplicationKey.KeyTypeEnum.PRODUCTION)) {
+                    return key;
+                }
+            }
+            return null;
+        }
+    }
+
+    private static Subscription getExistingSubscription(SubscriptionList existingSubscriptions, Subscription subscription) {
+        for (Subscription apiSubscription : existingSubscriptions.getList()) {
+            if (apiSubscription.getApplicationId().equals(subscription.getApplicationId())) {
+                return apiSubscription;
+            }
+        }
+        return null;
     }
 
 

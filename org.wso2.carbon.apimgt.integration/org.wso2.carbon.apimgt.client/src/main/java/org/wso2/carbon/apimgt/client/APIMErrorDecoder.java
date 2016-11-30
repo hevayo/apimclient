@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.apimgt.client.common;
+package org.wso2.carbon.apimgt.client;
 
 import feign.Response;
 import feign.codec.ErrorDecoder;

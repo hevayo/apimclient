@@ -16,15 +16,31 @@
  * under the License.
  */
 
-package org.wso2.carbon.apimgt.client.common;
+package org.wso2.carbon.apimgt.client.configs;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
+import javax.xml.bind.annotation.XmlElement;
 
-public class TrustedHostnameVerifier implements HostnameVerifier {
+public class TokenEndpointConfig {
 
-    @Override
-    public boolean verify(String hostname, SSLSession session) {
-        return true;
+    private String url;
+    private TokenConfig token;
+
+    @XmlElement(name = "URL", required = true)
+    public String getUrl() {
+        return url;
     }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    @XmlElement(name = "TokenInfo", required = true)
+    public TokenConfig getTokenInfo() {
+        return token;
+    }
+
+    public void setTokenInfo(TokenConfig token) {
+        this.token = token;
+    }
+
 }

@@ -18,7 +18,7 @@
 
 package org.wso2.carbon.apimgt.dcr.client.internal;
 
-import org.wso2.carbon.apimgt.client.common.APIMClientException;
+import org.wso2.carbon.apimgt.client.APIMClientException;
 import org.wso2.carbon.apimgt.dcr.client.model.ClientProfileDTO;
 import org.wso2.carbon.apimgt.dcr.client.model.OAuthApplicationDTO;
 import org.wso2.carbon.apimgt.dcr.client.model.TokenDTO;

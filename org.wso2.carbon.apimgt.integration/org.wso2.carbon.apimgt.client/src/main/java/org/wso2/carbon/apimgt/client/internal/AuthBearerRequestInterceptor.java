@@ -16,20 +16,23 @@
  * under the License.
  */
 
-package org.wso2.carbon.apimgt.client.common.configs;
+package org.wso2.carbon.apimgt.client.internal;
 
-import javax.xml.bind.annotation.XmlElement;
 
-public class StoreEndpointConfig {
+import feign.RequestInterceptor;
+import feign.RequestTemplate;
 
-    private String url;
+public class AuthBearerRequestInterceptor implements RequestInterceptor {
+    private String accessToken;
 
-    @XmlElement(name = "URL", required = true)
-    public String getUrl() {
-        return url;
+    public AuthBearerRequestInterceptor(String accessToken) {
+        this.accessToken = accessToken;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    @Override
+    public void apply(RequestTemplate template) {
+        template.header("Authorization", "Bearer " + this.accessToken);
     }
+
 }
+

@@ -16,11 +16,10 @@
  * under the License.
  */
 
-package org.wso2.carbon.apimgt.client.common;
+package org.wso2.carbon.apimgt.client;
 
 import org.w3c.dom.Document;
-import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.client.common.configs.APIMConfig;
+import org.wso2.carbon.apimgt.client.configs.APIMConfig;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -37,7 +36,7 @@ public class APIMConfigReader {
     private static String apimIntegrationXmlFilePath = "";
 
     //TOD file may be a part of another file
-    public synchronized static APIMConfig getAPIMConfig(String configFilePath) throws APIManagementException {
+    public synchronized static APIMConfig getAPIMConfig(String configFilePath) throws APIMClientException {
         if (config == null) {
             apimIntegrationXmlFilePath = configFilePath;
             init();
@@ -45,7 +44,7 @@ public class APIMConfigReader {
         return config;
     }
 
-    private static void init() throws APIManagementException {
+    private static void init() throws APIMClientException {
         try {
             File apimConfigFile = new File(apimIntegrationXmlFilePath);
             Document doc = convertToDocument(apimConfigFile);
@@ -54,11 +53,11 @@ public class APIMConfigReader {
             Unmarshaller unmarshaller = ctx.createUnmarshaller();
             config = (APIMConfig) unmarshaller.unmarshal(doc);
         } catch (JAXBException e) {
-            throw new APIManagementException("Error occurred while un-marshalling APIMConfig", e);
+            throw new APIMClientException("Error occurred while un-marshalling APIMConfig", e);
         }
     }
 
-    private static Document convertToDocument(File file) throws APIManagementException {
+    private static Document convertToDocument(File file) throws APIMClientException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         try {
@@ -66,7 +65,7 @@ public class APIMConfigReader {
             DocumentBuilder docBuilder = factory.newDocumentBuilder();
             return docBuilder.parse(file);
         } catch (Exception e) {
-            throw new APIManagementException("Error occurred while parsing file 'apim-integration.xml' to a org.w3c.dom.Document", e);
+            throw new APIMClientException("Error occurred while parsing file 'apim-integration.xml' to a org.w3c.dom.Document", e);
         }
     }
 

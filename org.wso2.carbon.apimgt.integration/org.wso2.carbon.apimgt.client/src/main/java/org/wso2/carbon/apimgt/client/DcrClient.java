@@ -20,9 +20,7 @@ package org.wso2.carbon.apimgt.client;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.client.common.APIMClientException;
-import org.wso2.carbon.apimgt.client.common.configs.APIMConfig;
+import org.wso2.carbon.apimgt.client.configs.APIMConfig;
 import org.wso2.carbon.apimgt.dcr.client.internal.InternalDcrClient;
 import org.wso2.carbon.apimgt.dcr.client.model.OAuthApplicationDTO;
 import org.wso2.carbon.apimgt.dcr.client.model.TokenDTO;
@@ -39,12 +37,12 @@ public class DcrClient {
      *
      * @param config - An instance of APIMConfig, see apim-integration.xml
      * @param config - An instance of APIMClient
-     * @throws APIManagementException
+     * @throws APIMClientException
      */
-    public DcrClient(APIMConfig config) throws APIManagementException {
+    public DcrClient(APIMConfig config) throws APIMClientException {
         log.debug("Initializing APIMDcrClient");
         if (config == null) {
-            throw new APIManagementException("APIM config should not be null, see apim-ntegration.xml");
+            throw new APIMClientException("APIM config should not be null, see apim-ntegration.xml");
         }
         this.config = config;
         internalDcrClient = new InternalDcrClient();

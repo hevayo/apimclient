@@ -16,8 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.apimgt.client.common;
-//TODO rename as org.wso2.carbon.apimgt.client
+package org.wso2.carbon.apimgt.client.internal;
 
 
 import org.apache.commons.logging.Log;
@@ -33,6 +32,7 @@ import java.security.NoSuchAlgorithmException;
 public class TrustedFeignClient extends feign.Client.Default {
 
     private static final Log log = LogFactory.getLog(TrustedFeignClient.class);
+
     private static TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
         public java.security.cert.X509Certificate[] getAcceptedIssuers() {
             return null;

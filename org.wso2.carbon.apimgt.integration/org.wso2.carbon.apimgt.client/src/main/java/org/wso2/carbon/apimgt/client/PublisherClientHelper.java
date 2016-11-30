@@ -1,12 +1,8 @@
-package org.wso2.carbon.apimgt.client.helpers;
+package org.wso2.carbon.apimgt.client;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.wso2.carbon.apimgt.api.APIManagementException;
-import org.wso2.carbon.apimgt.client.DcrClient;
-import org.wso2.carbon.apimgt.client.PublisherClient;
-import org.wso2.carbon.apimgt.client.common.APIMClientException;
-import org.wso2.carbon.apimgt.client.common.configs.APIMConfig;
+import org.wso2.carbon.apimgt.client.configs.APIMConfig;
 import org.wso2.carbon.apimgt.publisher.client.model.API;
 import org.wso2.carbon.apimgt.publisher.client.model.APIInfo;
 import org.wso2.carbon.apimgt.publisher.client.model.APIList;
@@ -15,29 +11,23 @@ import java.util.List;
 
 public class PublisherClientHelper {
     private static final Log log = LogFactory.getLog(PublisherClientHelper.class);
-    private PublisherClient internalPublisherClient;
-    private APIMConfig config;
+    private PublisherClient publisherClient;
     private DcrClient dcrClient;
 
     /**
      * Initialize APIMIntegration client with a APIMConfig provided as the config
      *
      * @param config - An instance of APIMConfig, see apim-integration.xml
-     * @throws APIManagementException
+     * @throws APIMClientException
      */
-    public PublisherClientHelper(APIMConfig config) throws APIManagementException {
+    public PublisherClientHelper(APIMConfig config) throws APIMClientException {
         if (config == null) {
-            throw new APIManagementException("APIM config should not be null, see apim-ntegration.xml");
+            throw new APIMClientException("APIM config should not be null, see apim-ntegration.xml");
         }
-        this.config = config;
-        this.internalPublisherClient = new PublisherClient(config);
+        this.publisherClient = new PublisherClient(config);
         this.dcrClient = new DcrClient(config);
     }
 
-    //TODO to be removed once apim fix is avaialbe
-    public void setDcrClient(DcrClient dcrClient) {
-        this.dcrClient = dcrClient;
-    }
 
     /**
      * Get a list of of available APIs (from WSO2-APIM) qualifying under a given search query.
@@ -50,11 +40,11 @@ public class PublisherClientHelper {
 
         APIList publisherApis = null;
         try {
-            publisherApis = internalPublisherClient.getAvailableApis("", 100, 0);
+            publisherApis = publisherClient.getAvailableApis("", 100, 0);
         } catch (APIMClientException e) {
             if (e.getResponseStatus() == 401) {
                 dcrClient.getRenewedToken();
-                publisherApis = internalPublisherClient.getAvailableApis("", 100, 0);
+                publisherApis = publisherClient.getAvailableApis("", 100, 0);
             } else {
                 throw e;
             }
@@ -75,19 +65,19 @@ public class PublisherClientHelper {
         List<APIInfo> apiLIst = publisherApiList.getList();
         API existingAPI = getExistingApi(apiDTO, apiLIst);
         if (existingAPI != null) {
-            System.out.println("API " + existingAPI.getName() + " apready exists, therefore not creating");
+            log.info("API " + existingAPI.getName() + " apready exists, therefore not creating");
             if ("PUBLISHED".equals(existingAPI.getStatus())) {
-                System.out.println("API " + existingAPI.getName() + " apready in PUBLISHED state, therefore not publishing");
+                log.info("API " + existingAPI.getName() + " apready in PUBLISHED state, therefore not publishing");
             } else {
                 boolean publishResult = publishAPI(existingAPI.getId());
-                System.out.println("API publish result " + publishResult);
+                log.info("API publish result " + publishResult);
             }
             return existingAPI;
         } else {
             API createdAPI = createAPI(apiDTO);
-            System.out.println("API creation successfull createdAPI.getId() = " + createdAPI.getId());
+            log.info("API creation successfull createdAPI.getId() = " + createdAPI.getId());
             boolean result = publishAPI(createdAPI.getId());
-            System.out.println("API publish done result = " + result);
+            log.info("API publish done result = " + result);
             return createdAPI;
         }
     }
@@ -104,11 +94,11 @@ public class PublisherClientHelper {
 
         API publisherApi = null;
         try {
-            publisherApi = internalPublisherClient.createApi(apiDTO);
+            publisherApi = publisherClient.createApi(apiDTO);
         } catch (APIMClientException e) {
             if (e.getResponseStatus() == 401) {
                 dcrClient.getRenewedToken();
-                publisherApi = internalPublisherClient.createApi(apiDTO);
+                publisherApi = publisherClient.createApi(apiDTO);
             } else {
                 throw e;
             }
@@ -123,16 +113,16 @@ public class PublisherClientHelper {
      * @return - True if publishing is successful, false otherwise
      * @throws APIMClientException - If fails to invoke the operation due to wrong credentials or any other issue
      */
-    private boolean publishAPI(String apiID) throws APIMClientException {
+    public boolean publishAPI(String apiID) throws APIMClientException {
 
         boolean result = false;
         try {
-            internalPublisherClient.changeApiLifecycle("Publish", apiID);
+            publisherClient.changeApiLifecycle("Publish", apiID);
             result = true;
         } catch (APIMClientException e) {
             if (e.getResponseStatus() == 401) {
                 dcrClient.getRenewedToken();
-                internalPublisherClient.changeApiLifecycle("Publish", apiID);
+                publisherClient.changeApiLifecycle("Publish", apiID);
                 result = true;
             } else {
                 throw e;
@@ -157,11 +147,11 @@ public class PublisherClientHelper {
         API api = null;
         if (apiInfo != null) {
             try {
-                api = internalPublisherClient.getApi(apiInfo.getId());
+                api = publisherClient.getApi(apiInfo.getId());
             } catch (APIMClientException e) {
                 if (e.getResponseStatus() == 401) {
                     dcrClient.getRenewedToken();
-                    api = internalPublisherClient.getApi(apiInfo.getId());
+                    api = publisherClient.getApi(apiInfo.getId());
                 } else {
                     throw e;
                 }

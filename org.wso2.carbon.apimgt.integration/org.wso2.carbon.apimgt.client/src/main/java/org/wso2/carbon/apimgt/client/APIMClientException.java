@@ -16,7 +16,7 @@
  * under the License.
  */
 
-package org.wso2.carbon.apimgt.client.common;
+package org.wso2.carbon.apimgt.client;
 
 public class APIMClientException extends Exception {
 
@@ -30,6 +30,14 @@ public class APIMClientException extends Exception {
         this.methodKey = methodKey;
         this.responseReason = reason;
         this.responseStatus = status;
+    }
+
+    APIMClientException(String message) {
+        super(message);
+    }
+
+    APIMClientException(String message, Exception e) {
+        super(message, e);
     }
 
     public String getResponseReason() {
