@@ -20,7 +20,7 @@
 
     <modelVersion>4.0.0</modelVersion>
     <artifactId>org.wso2.carbon.apimgt.store.client</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
     <name>org.wso2.carbon.apimgt.store.client</name>
 
     <build>
@@ -72,11 +72,49 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Bundle-Name>${project.artifactId}</Bundle-Name>
+                        <Bundle-Version>${project.version}</Bundle-Version>
+                        <Bundle-Description>APIM Integration</Bundle-Description>
+                        <Private-Package></Private-Package>
+                        <Export-Package>
+                            org.wso2.carbon.apimgt.store.client.model;version="[2.0.0, 2.1.0)",
+                            org.wso2.carbon.apimgt.store.client.api;version="[2.0.0, 2.1.0)",
+			    org.wso2.carbon.apimgt.store.client.invoker;version="[2.0.0, 2.1.0)"
+                        </Export-Package>
+                        <Import-Package>
+				org.osgi.framework,
+				org.osgi.service.component,
+				org.wso2.carbon.logging,
+				io.swagger,
+				junit,
+                                javax.ws.rs;version="1.1.1",
+			        feign;version="[9.3,10)",
+				feign.jackson;version="[9.3,10)",
+				feign.codec;version="[9.3,10)",
+				feign.auth;version="[9.3,10)",
+				feign.gson;version="[9.3,10)",
+				feign.slf4j;version="[9.3,10)",
+                                feign.jaxrs;version="[9.3,10)",
+                                com.google.gson;version="[2.3,3)",
+				com.fasterxml.jackson.core;version="[2.4,3)"
+                        </Import-Package>
+                        <Embed-Dependency>
+                        </Embed-Dependency>
+                    </instructions>
+                </configuration>
+            </plugin>
 
         </plugins>
     </build>
-    <dependencies>
 
+    <dependencies>
         <!-- dependencies are needed for the client being generated -->
         <dependency>
             <groupId>io.swagger</groupId>
