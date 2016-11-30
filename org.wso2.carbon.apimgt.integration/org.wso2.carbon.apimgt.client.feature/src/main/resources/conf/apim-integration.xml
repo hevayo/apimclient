@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!--
+/*
+ * Copyright (c) 2016, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
+ *
+ * WSO2 Inc. licenses this file to you under the Apache License,
+ * Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+ -->
+
+<APIMConfiguration>
+	<DCREndpoint>
+		<URL>http://localhost:9763/client-registration/v0.10/register</URL>
+		<UserName>admin</UserName>
+		<Password>admin</Password>
+		<ClientProfile>
+			<clientName>iotClient1</clientName>
+			<callbackUrl>www.goole.com</callbackUrl>
+			<tokenScope>Production</tokenScope>
+			<owner>admin</owner>
+			<grantType>password refresh_token</grantType>
+			<saasApp>true</saasApp>
+		</ClientProfile>
+	</DCREndpoint>
+	<TokenEndpoint>
+		<URL>https://localhost:8243/token</URL>
+		<TokenInfo>
+			<UserName>admin</UserName>
+			<Password>admin</Password>
+			<Scope>apim:api_create apim:api_view apim:api_publish apim:subscribe</Scope>
+			<GrantType>password</GrantType>
+		</TokenInfo>
+	</TokenEndpoint>
+	<PublisherEndpoint>
+		<URL>https://localhost:9443/api/am/publisher/v0.10</URL>
+	</PublisherEndpoint>
+	<StoreEndpoint>
+		<URL>https://localhost:9443/api/am/store/v0.10</URL>
+	</StoreEndpoint>
+</APIMConfiguration>
